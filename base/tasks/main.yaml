@@ -1,0 +1,40 @@
+---
+
+- name: install base tools
+  become: yes
+  apt:
+    name: "{{packages}}"
+    update_cache: yes
+  vars:
+    packages:
+      - "vim"
+      - "tree"
+      - "lsof"
+      - "socat"
+      - "acl"
+      - "net-tools"
+      - "fail2ban"
+
+- name: disable swap
+  become: yes
+  command: "swapoff -a"
+
+- name: remove swap apt package
+  become: yes
+  apt: state="absent" name="dphys-swapfile"
+
+- name: set timezone
+  become: yes
+  timezone: name="{{timezone}}"
+
+- name: remove bluetooth
+  become: yes
+  apt: name="bluez" purge="yes"
+
+- name: configure fail2ban
+  become: yes
+  copy: src="jail.local" dest="/etc/fail2ban/jail.local"
+
+- name: autoremove
+  become: yes
+  apt: autoremove="yes"
